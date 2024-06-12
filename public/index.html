@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KONSPIRATIONSNYTT</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #f0f0f0;
+            background-image: url('./images/folie.jpg');  /* Sätter bakgrundsbild */
+            background-size: cover;  /* Gör så att bakgrunden täcker hela skärmen */
+            background-position: center;  /* Centrerar bakgrunden */
+            background-repeat: no-repeat;  /* Undviker att bakgrunden upprepas */
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border: 1px solid #000;
+        }
+        h1 {
+            text-align: center;
+            color: #000;
+        }
+        .nav {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .nav a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #000;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .form-group button {
+            width: 100%;
+            padding: 10px;
+            background-color: #000;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #444;
+        }
+        .messageboard {
+            border-top: 1px solid #ffffff;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        .message {
+            border-bottom: 1px solid #ffffff;
+            padding: 10px 0;
+        }
+        .message h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .message p {
+            margin: 5px 0 0 0;
+        }
+        #new-post {
+        width: 630px;
+        margin: 20px auto; /* Centrerar elementet horisontellt och lägger till vertikala marginaler */
+            color: #fff;
+        }
+        .form-group button {
+    background-color: #4d4d4d;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>KONSPIRATIONSNYTT</h1>
+        <div class="nav">
+            <a href="#login">Login</a> | <a href="#register">Registrering</a>
+        </div>
+        <div id="login">
+            <h2>Login</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Användarnamn:</label>
+                    <input type="text" id="username" name="username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Lösenord:</label>
+                    <input type="password" id="password" name="password">
+                </div>
+                <div class="form-group">
+                    <button type="submit">Logga in</button>
+                </div>
+            </form>
+        </div>
+        <div id="register">
+            <h2>Registrering</h2>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="new-username">Användarnamn:</label>
+                    <input type="text" id="new-username" name="new-username">
+                </div>
+                <div class="form-group">
+                    <label for="new-password">Lösenord:</label>
+                    <input type="password" id="new-password" name="new-password">
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">Bekräfta lösenord:</label>
+                    <input type="password" id="confirm-password" name="confirm-password">
+                </div>
+                <div class="form-group">
+                    <button type="submit">Registrera</button>
+                </div>
+            </form>
+        </div>
+        <div>            <h2>Inlägg</h2>
+        </div>
+        <div class="messageboard">
+        </div>
+    </div>
+    <div id="new-post">
+        <h2>Ny Post</h2>
+        <form id="post-form">
+            <div class="form-group">
+                <label for="content">Inlägg:</label>
+                <textarea id="content" name="content" rows="4" required></textarea>
+            </div>
+            <div class="form-group">
+                <button type="submit">Skicka</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('new-username').value;
+            const password = document.getElementById('new-password').value;
+
+            try {
+                const response = await fetch('http://localhost:3333/users/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (!response.ok) {
+                    const error = await response.text();
+                    throw new Error(error);
+                }
+
+                alert('Registration successful!');
+            } catch (error) {
+                alert('Registration failed: ' + error.message);
+            }
+        });
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('http://localhost:3333/users/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (!response.ok) {
+                    const error = await response.text();
+                    throw new Error(error);
+                }
+
+                const data = await response.json();
+        const token = data.token;  // Extraherar tokensträngen från response data
+        console.log(token);  // Loggar tokenen till konsolen
+        localStorage.setItem('authToken', token);  // Lagrar token i localStorage utan "token:" prefix
+        alert('Login successful!');          
+            } catch (error) {
+                alert('Login failed: ' + error.message);
+            }
+        });
+        async function loadPosts() {
+    const authToken = localStorage.getItem('authToken');  // Hämtar token från localStorage
+
+    try {
+        const response = await fetch('http://localhost:3333/posts', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${authToken}`  // Skickar token i Authorization header
+            }
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(error);
+        }
+
+        const posts = await response.json();
+        const messageBoard = document.querySelector('.messageboard');
+        messageBoard.innerHTML = '';  // Tömmer messageBoard innan nya inlägg läggs till
+
+        posts.forEach(post => {
+            const message = document.createElement('div');
+            message.classList.add('message');
+            message.innerHTML = `<h2>${post.user.username}</h2><p>${post.content}</p>`;
+            messageBoard.appendChild(message);
+        });
+    } catch (error) {
+        console.error('Error loading posts:', error);  // Loggar fel till konsolen
+        alert('Error loading posts: ' + error.message);
+    }
+}
+
+document.getElementById('post-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const content = document.getElementById('content').value;
+    const authToken = localStorage.getItem('authToken');  // Hämtar token från localStorage
+
+    try {
+        const response = await fetch('http://localhost:3333/posts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`  // Skickar token i Authorization header
+            },
+            body: JSON.stringify({ content })
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(error);
+        }
+
+        alert('Post created successfully');  // Valfritt: visa ett meddelande om att posten skapades
+        loadPosts();  // Ladda om poster efter att en ny post har skapats
+    } catch (error) {
+        console.error('Error creating post:', error);  // Loggar fel till konsolen
+        alert('Error creating post: ' + error.message);
+    }
+});
+
+loadPosts();  // Ladda poster när sidan laddas
+
+    </script>
+</body>
+</html>
